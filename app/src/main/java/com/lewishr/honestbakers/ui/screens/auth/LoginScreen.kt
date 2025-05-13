@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -17,6 +18,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -29,11 +31,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.lewishr.honestbakers.R
+import com.lewishr.honestbakers.navigation.ROUT_ADD_BAKES
 import com.lewishr.honestbakers.navigation.ROUT_HOME
 import com.lewishr.honestbakers.navigation.ROUT_MENU
 import com.lewishr.honestbakers.navigation.ROUT_REGISTER
 import com.lewishr.honestbakers.navigation.ROUT_START
+import com.lewishr.honestbakers.ui.theme.new2
 import com.lewishr.honestbakers.ui.theme.newbrown
+import com.lewishr.honestbakers.ui.theme.newwite
 
 
 import com.lewishr.honestbakers.viewmodel.AuthViewModel
@@ -57,7 +62,7 @@ fun LoginScreen(
                 Toast.makeText(context, "Invalid Credentials", Toast.LENGTH_SHORT).show()
             } else {
                 if (user.role == "admin") {
-                    navController.navigate(ROUT_MENU) {
+                    navController.navigate(ROUT_ADD_BAKES) {
                     }
                 } else {
                     navController.navigate(ROUT_START) {
@@ -72,31 +77,27 @@ fun LoginScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(20.dp)
-            .paint(painter = painterResource(R.drawable.img_9), contentScale = ContentScale.FillBounds),
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(newbrown, Color(0xFFFFF8E1)) // example gradient colors
+                )
+            ),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Card (
-            modifier = Modifier.fillMaxWidth()
-        ){
-
-
-            Column (
-                modifier = Modifier.fillMaxWidth()
-            ){
-                Image(
-                    painter = painterResource(R.drawable.img_1),
-                    contentDescription = "",
-                    modifier = Modifier.fillMaxWidth().height(200.dp),
-                    contentScale = ContentScale.FillWidth)
-            }
-        }
+        Image(
+            painter = painterResource(R.drawable.img_14),
+            contentDescription = "",
+            alignment = Alignment.Center,
+            modifier = Modifier.size(100.dp).clip(shape = CircleShape),
+            contentScale = ContentScale.Crop
+        )
         Spacer(modifier = Modifier.height(10.dp))
         Card (
             modifier = Modifier.height(400.dp).width(300.dp)
         ){
             Column (
-                modifier = Modifier.fillMaxWidth().background(newbrown).padding(start = 10.dp, end = 10.dp).height(400.dp)
+                modifier = Modifier.fillMaxWidth().background(new2).padding(start = 10.dp, end = 10.dp).height(400.dp)
             ){
                 // Animated Welcome Text
                 AnimatedVisibility(
@@ -118,10 +119,15 @@ fun LoginScreen(
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("Email") },
-                    leadingIcon = { Icon(Icons.Filled.Email, contentDescription = "Email Icon") },
+                    leadingIcon = { Icon(Icons.Filled.Email, contentDescription = "Email Icon", tint = newbrown) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedBorderColor = newbrown,
+                    focusedBorderColor = newbrown,
+                    focusedLabelColor = newbrown
+                ),
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -131,15 +137,20 @@ fun LoginScreen(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("Password") },
-                    leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Password Icon") },
+                    leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Password Icon", tint = newbrown) },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = newbrown,
+                        focusedBorderColor = newbrown,
+                        focusedLabelColor = newbrown
+                    ),
                     trailingIcon = {
                         val image =
                             if (passwordVisible) painterResource(R.drawable.eye) else painterResource(
-                                R.drawable.eye
+                                R.drawable.visibility
                             )
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
@@ -178,7 +189,7 @@ fun LoginScreen(
                             }
                         },
                         modifier = Modifier.fillMaxSize(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                        colors = ButtonDefaults.buttonColors(containerColor = newbrown),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text("Login", color = Color.White)

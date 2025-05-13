@@ -19,15 +19,18 @@ import com.lewishr.honestbakers.repository.UserRepository
 import com.lewishr.honestbakers.ui.screens.Bakes.AddBakesScreen
 import com.lewishr.honestbakers.ui.screens.Bakes.BakesListScreen
 import com.lewishr.honestbakers.ui.screens.Bakes.EditBakesScreen
+import com.lewishr.honestbakers.ui.screens.Bakes.MenuBakesScreen
 import com.lewishr.honestbakers.ui.screens.Menu.MenuScreen
 import com.lewishr.honestbakers.ui.screens.about.AboutScreen
 import com.lewishr.honestbakers.ui.screens.auth.LoginScreen
 import com.lewishr.honestbakers.ui.screens.auth.RegisterScreen
+
 import com.lewishr.honestbakers.ui.screens.chat.ChatScreen
 
 
 import com.lewishr.honestbakers.ui.screens.home.HomeScreen
 import com.lewishr.honestbakers.ui.screens.lonation.LocationScreen
+import com.lewishr.honestbakers.ui.screens.notification.NotificationScreen
 import com.lewishr.honestbakers.ui.screens.payment.PaymentScreen
 
 import com.lewishr.honestbakers.ui.screens.profile.ProfileScreen
@@ -45,7 +48,7 @@ import com.lewishr.honestbakers.viewmodel.ChatViewModelFactory
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = ROUT_START,
+    startDestination: String = ROUT_SPLASH,
     bakesViewModel: BakesViewModel = viewModel()
 
 ) {
@@ -88,6 +91,9 @@ fun AppNavHost(
         composable(ROUT_PROFILE) {
             ProfileScreen(navController)
         }
+        composable(ROUT_NOTIFICATION) {
+            NotificationScreen(navController)
+        }
         composable(ROUT_CHAT) {
             ChatScreen(chatViewModel) // ✅ Correct ViewModel reference
         }
@@ -121,6 +127,9 @@ fun AppNavHost(
 
         composable(ROUT_BAKES_LIST) {
             BakesListScreen(navController, bakesViewModel)
+        }
+        composable(ROUT_MENU_BAKES) {
+            MenuBakesScreen(navController, bakesViewModel)
         }
 
         composable(

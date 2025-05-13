@@ -1,5 +1,7 @@
 package com.lewishr.honestbakers.ui.screens.lonation
 
+
+
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -30,7 +32,7 @@ fun LocationScreen(navController: NavController) {
     val permissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
     val context = LocalContext.current
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
-    var nearbyHospitals by remember { mutableStateOf<List<LatLng>>(emptyList()) }
+    var nearbyBakeries by remember { mutableStateOf<List<LatLng>>(emptyList()) }
 
     // Request permission if not granted
     if (!permissionState.status.isGranted) {
@@ -44,7 +46,7 @@ fun LocationScreen(navController: NavController) {
             userLocation = getCurrentLocation(context)
             userLocation?.let {
                 // Fetch nearby hospitals once location is available
-                nearbyHospitals = getNearbyHospitals(context, it)
+                nearbyBakeries = getNearbyBakeries(context, it)
             }
         }
     }
@@ -67,10 +69,10 @@ fun LocationScreen(navController: NavController) {
                 )
 
                 // Markers for nearby hospitals
-                nearbyHospitals.forEach { hospital ->
+                nearbyBakeries.forEach { bakery ->
                     Marker(
-                        state = MarkerState(position = hospital),
-                        title = "Nearby Hospital"
+                        state = MarkerState(position = bakery),
+                        title = "Nearby Bakery"
                     )
                 }
             }
@@ -107,23 +109,23 @@ suspend fun getCurrentLocation(context: Context): LatLng? {
 
 
 // Fetch nearby hospitals
-suspend fun getNearbyHospitals(context: Context, location: LatLng): List<LatLng> {
+suspend fun getNearbyBakeries(context: Context, location: LatLng): List<LatLng> {
     return withContext(Dispatchers.IO) {
         try {
             val url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json" +
                     "?location=${location.latitude},${location.longitude}" +
-                    "&radius=5000&type=hospital&key=YOUR_API_KEY"
+                    "&radius=5000&type=bakeries&key=YOUR_API_KEY"
 
             val result = URL(url).readText()
             val json = JSONObject(result)
             val results = json.getJSONArray("results")
 
-            val hospitals = mutableListOf<LatLng>()
+            val bakeries = mutableListOf<LatLng>()
             for (i in 0 until results.length()) {
                 val loc = results.getJSONObject(i).getJSONObject("geometry").getJSONObject("location")
-                hospitals.add(LatLng(loc.getDouble("lat"), loc.getDouble("lng")))
+                bakeries.add(LatLng(loc.getDouble("lat"), loc.getDouble("lng")))
             }
-            return@withContext hospitals
+            return@withContext bakeries
         } catch (e: Exception) {
             e.printStackTrace()
             return@withContext emptyList<LatLng>() // Return empty list on failure

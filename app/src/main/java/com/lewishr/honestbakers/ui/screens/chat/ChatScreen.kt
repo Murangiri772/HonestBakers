@@ -55,7 +55,7 @@ fun ChatScreen(chatViewModel: ChatViewModel = viewModel()) {
 
         when (selectedTab) {
             0 -> ChatTab(messages, messageText, { messageText = it }) {
-                chatViewModel.sendMessage("Glory", messageText)
+                chatViewModel.sendMessage("Lewis", messageText)
                 messageText = ""
             }
             1 -> StatusTab()
@@ -84,7 +84,7 @@ fun ChatTab(messages: List<Message>, messageText: String, onTextChange: (String)
 // ✅ Chat Bubble (WhatsApp Style)
 @Composable
 fun ChatBubble(message: Message) {
-    val isSentByUser = message.sender == "Glory"
+    val isSentByUser = message.sender == "Lewis"
     val bubbleColor = if (isSentByUser) Color(0xFFDCF8C6) else Color.White
     val alignment = if (isSentByUser) Alignment.End else Alignment.Start
 

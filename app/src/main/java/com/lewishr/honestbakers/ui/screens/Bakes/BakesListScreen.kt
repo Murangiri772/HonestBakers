@@ -1,182 +1,338 @@
 package com.lewishr.honestbakers.ui.screens.Bakes
 
+import android.content.ContentValues
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.pdf.PdfDocument
 import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.lewishr.honestbakers.R
+import com.lewishr.honestbakers.viewmodel.BakesViewModel
 import com.lewishr.honestbakers.model.Bakes
 import com.lewishr.honestbakers.navigation.ROUT_ADD_BAKES
 import com.lewishr.honestbakers.navigation.ROUT_BAKES_LIST
+import com.lewishr.honestbakers.navigation.ROUT_EDIT_BAKES
+import com.lewishr.honestbakers.navigation.editBakesRoute
 
-import com.lewishr.honestbakers.viewmodel.BakesViewModel
 
+import java.io.IOException
+import java.io.OutputStream
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditBakesScreen(bakesId: Int?, navController: NavController, viewModel: BakesViewModel) {
-    val context = LocalContext.current
+fun BakesListScreen(navController: NavController, viewModel: BakesViewModel) {
     val bakesList by viewModel.allBakes.observeAsState(emptyList())
-
-    // Ensure productId is valid
-    val bakes = remember(bakesList) { bakesList.find { it.id == bakesId } }
-
-    // Track state variables only when product is found
-    var name by remember { mutableStateOf(bakes?.name ?: "") }
-    var price by  remember { mutableStateOf(bakes?.price?.toString() ?: "") }
-    var imagePath by remember { mutableStateOf(bakes?.imagePath ?: "") }
     var showMenu by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
 
-    // Image picker
-    val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            imagePath = it.toString()
-            Toast.makeText(context, "Image Selected!", Toast.LENGTH_SHORT).show()
-        }
+    val filteredBakes = bakesList.filter {
+        it.name.contains(searchQuery, ignoreCase = true)
     }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Edit Bakes") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+            Column {
+                TopAppBar(
+                    title = { Text("Bakes", fontSize = 20.sp) },
+                    colors = TopAppBarDefaults.mediumTopAppBarColors(Color.LightGray),
+                    actions = {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Bakes List") },
+                                onClick = {
+                                    navController.navigate(ROUT_BAKES_LIST)
+                                    showMenu = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Add Product") },
+                                onClick = {
+                                    navController.navigate(ROUT_ADD_BAKES)
+                                    showMenu = false
+                                }
+                            )
+                        }
                     }
-                },
-                actions = {
-                    IconButton(onClick = { showMenu = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Menu")
-                    }
-                    DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("Home") },
-                            onClick = {
-                                navController.navigate(ROUT_BAKES_LIST)
-                                showMenu = false
-                            }
+                )
+
+
+                //Search Bar
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    placeholder = { Text("Search bakess...") },
+                    singleLine = true,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search",
+                            tint = Color.Gray
                         )
-                        DropdownMenuItem(
-                            text = { Text("Add Bakes") },
-                            onClick = {
-                                navController.navigate(ROUT_ADD_BAKES)
-                                showMenu = false
-                            }
-                        )
-                    }
-                }
-            )
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Black,  // Border color when focused
+                        unfocusedBorderColor = Color.Gray, // Border color when not focused
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.DarkGray
+                    )
+                )
+            }
         },
-        bottomBar = { BottomNavigationBar2(navController) }
+        bottomBar = { BottomNavigationBar1(navController) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(16.dp)
         ) {
-            if (bakes != null) {
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text("Bakes Name") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = price,
-                    onValueChange = { price = it },
-                    label = { Text("Bakes Price") },
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Display Image
-                Image(
-                    painter = rememberAsyncImagePainter(model = Uri.parse(imagePath)),
-                    contentDescription = "Bakes Image",
-                    modifier = Modifier
-                        .size(150.dp)
-                        .padding(8.dp)
-                )
-
-                Button(
-                    onClick = { imagePicker.launch("image/*") },
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(start = 40.dp, end = 40.dp),
-                    colors = ButtonDefaults.buttonColors(Color.LightGray)
-                ) {
-                    Text("Change Image")
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = {
-                        val updatedPrice = price.toDoubleOrNull()
-                        if (updatedPrice != null) {
-                            viewModel.updateBakes(bakes.copy(name = name, price = updatedPrice, imagePath = imagePath))
-                            Toast.makeText(context, "bake Updated!", Toast.LENGTH_SHORT).show()
-                            navController.popBackStack()
-                        } else {
-                            Toast.makeText(context, "Invalid price entered!", Toast.LENGTH_SHORT).show()
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(start = 40.dp, end = 40.dp),
-                    colors = ButtonDefaults.buttonColors(Color.Black)
-                ) {
-                    Text("Update Bakes")
-                }
-            } else {
-                Text(text = "Product not found", color = MaterialTheme.colorScheme.error)
-                Button(onClick = { navController.popBackStack() }) {
-                    Text("Go Back")
+            LazyColumn {
+                items(filteredBakes.size) { index ->
+                    BakesItem(navController, filteredBakes[index], viewModel)
                 }
             }
         }
     }
 }
 
-// Bottom Navigation Bar
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
-fun BottomNavigationBar2(navController: NavController) {
+fun BakesItem(navController: NavController, bakes: Bakes, viewModel: BakesViewModel) {
+    val painter: Painter = rememberAsyncImagePainter(
+        model = bakes.imagePath?.let { Uri.parse(it) } ?: Uri.EMPTY
+    )
+    val context = LocalContext.current
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .clickable {
+                if (bakes.id != 0) {
+                    navController.navigate(ROUT_EDIT_BAKES)
+                }
+            },
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            // Bakes Image
+            Image(
+                painter = painter,
+                contentDescription = "Bakes Image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                contentScale = ContentScale.Crop
+            )
+
+            // Gradient Overlay
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .align(Alignment.BottomStart)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
+                        )
+                    )
+            )
+
+            // Product Info
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 12.dp, bottom = 60.dp)
+            ) {
+                Text(
+                    text = bakes.name,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Text(
+                    text = "Price: Ksh${bakes.price}",
+                    fontSize = 16.sp,
+                    color = Color.White
+                )
+            }
+
+            // Buttons (Message, Edit, Delete, Download PDF)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .align(Alignment.BottomEnd)
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+
+
+                    // Edit Product
+                    IconButton(
+                        onClick = {
+                            navController.navigate(editBakesRoute(bakes.id))
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit",
+                            tint = Color.White
+                        )
+                    }
+
+                    // Delete Product
+                    IconButton(
+                        onClick = { viewModel.deleteBakes(bakes) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete",
+                            tint = Color.White
+                        )
+                    }
+
+                    // Download PDF
+                    IconButton(
+                        onClick = { generateBakesPDF(context, bakes) }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.download),
+                            contentDescription = "",
+                            tint = Color.White
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.Q)
+fun generateBakesPDF(context: Context, bakes: Bakes) {
+    val pdfDocument = PdfDocument()
+    val pageInfo = PdfDocument.PageInfo.Builder(300, 500, 1).create()
+    val page = pdfDocument.startPage(pageInfo)
+    val canvas = page.canvas
+    val paint = android.graphics.Paint()
+
+    val bitmap: Bitmap? = try {
+        bakes.imagePath?.let {
+            val uri = Uri.parse(it)
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                BitmapFactory.decodeStream(inputStream)
+            }
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+
+    bitmap?.let {
+        val scaledBitmap = Bitmap.createScaledBitmap(it, 250, 150, false)
+        canvas.drawBitmap(scaledBitmap, 25f, 20f, paint)
+    }
+
+    paint.textSize = 16f
+    paint.isFakeBoldText = true
+    canvas.drawText("Product Details", 80f, 200f, paint)
+
+    paint.textSize = 12f
+    paint.isFakeBoldText = false
+    canvas.drawText("Name: ${bakes.name}", 50f, 230f, paint)
+    canvas.drawText("Price: Ksh${bakes.price}", 50f, 250f, paint)
+
+
+    pdfDocument.finishPage(page)
+
+    // Save PDF using MediaStore (Scoped Storage)
+    val fileName = "${bakes.name}_Details.pdf"
+    val contentValues = ContentValues().apply {
+        put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+        put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
+        put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+    }
+
+    val contentResolver = context.contentResolver
+    val uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+
+    if (uri != null) {
+        try {
+            val outputStream: OutputStream? = contentResolver.openOutputStream(uri)
+            if (outputStream != null) {
+                pdfDocument.writeTo(outputStream)
+                Toast.makeText(context, "PDF saved to Downloads!", Toast.LENGTH_LONG).show()
+            }
+            outputStream?.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Toast.makeText(context, "Failed to save PDF!", Toast.LENGTH_LONG).show()
+        }
+    } else {
+        Toast.makeText(context, "Failed to create file!", Toast.LENGTH_LONG).show()
+    }
+
+    pdfDocument.close()
+}
+
+// Bottom Navigation Bar Component
+@Composable
+fun BottomNavigationBar1(navController: NavController) {
     NavigationBar(
-        containerColor = Color(0xFF6F6A72),
+        containerColor = Color(0xFFA2B9A2),
         contentColor = Color.White
     ) {
         NavigationBarItem(
             selected = false,
             onClick = { navController.navigate(ROUT_BAKES_LIST) },
-            icon = { Icon(Icons.Default.Menu, contentDescription = "Bakes List") },
-            label = { Text("Bakes") }
+            icon = { Icon(Icons.Default.Home, contentDescription = "Bakes List") },
+            label = { Text("Home") }
         )
         NavigationBarItem(
             selected = false,
             onClick = { navController.navigate(ROUT_ADD_BAKES) },
-            icon = { Icon(Icons.Default.Menu, contentDescription = "Add Bakes") },
+            icon = { Icon(Icons.Default.AddCircle, contentDescription = "Add Bakes") },
             label = { Text("Add") }
         )
     }

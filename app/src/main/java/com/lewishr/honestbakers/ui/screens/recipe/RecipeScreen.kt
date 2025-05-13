@@ -49,6 +49,7 @@ import com.lewishr.honestbakers.navigation.ROUT_MENU
 
 import com.lewishr.honestbakers.ui.theme.newbrown
 import com.lewishr.honestbakers.ui.theme.newred
+import com.lewishr.honestbakers.ui.theme.newwite
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,11 +66,13 @@ fun RecipeScreen(navController: NavController){
         TopAppBar(
             title = { Text(text = "Recipes",
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp) },
+                fontSize = 20.sp,
+                color = newwite)
+                    },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = newbrown,
                 titleContentColor = Color.Black,
-                navigationIconContentColor = newred,
+                navigationIconContentColor = newwite,
 
                 ),
             navigationIcon = {

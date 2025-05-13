@@ -24,170 +24,82 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import java.text.SimpleDateFormat
-import java.util.*
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
-data class Notification(
+
+
+// Data class for a Notification item
+data class NotificationItem(
     val id: Int,
     val title: String,
     val message: String,
-    val time: Long,
-    val isRead: Boolean = false,
-    val icon: ImageVector = Icons.Default.Notifications
+    val time: String
 )
-
-class NotificationScreenActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            MaterialTheme {
-                NotificationScreen()
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationScreen() {
-    val notifications = remember {
-        mutableStateListOf(
-            Notification(
-                id = 1,
-                title = "Account Alert",
-                message = "Your account password was changed successfully.",
-                time = System.currentTimeMillis() - 3_600_000L,
-                isRead = false
-            ),
-            Notification(
-                id = 2,
-                title = "New Message",
-                message = "You have received a new message from John.",
-                time = System.currentTimeMillis() - 7_200_000L,
-                isRead = true
-            ),
-            Notification(
-                id = 3,
-                title = "Promotion",
-                message = "Get 20% off on your next purchase!",
-                time = System.currentTimeMillis() - 86_400_000L,
-                isRead = false
-            ),
-            Notification(
-                id = 4,
-                title = "Update Available",
-                message = "A new update is available. Please update the app.",
-                time = System.currentTimeMillis() - 172_800_000L,
-                isRead = true
-            )
-        )
-    }
+fun NotificationScreen(navController: NavController) {
+    // Sample notification list. Replace with your dynamic data source.
+    val notifications = listOf(
+        NotificationItem(1, "Order Confirmed", "Your order #1234 has been confirmed.", "10:30 AM"),
+        NotificationItem(2, "Payment Received", "We received your payment successfully.", "9:15 AM"),
+        NotificationItem(3, "New Message", "You have a new message from support.", "Yesterday"),
+        NotificationItem(4, "Discount Offer", "Get 10% off your next order!", "2 days ago")
+    )
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Notifications", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
+                title = { Text("Notifications") },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    containerColor = Color(0xFF4E342E), // Deep brown color
+                    titleContentColor = Color.White
                 )
             )
-        }
-    ) { paddingValues ->
-        if (notifications.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("No notifications", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-        } else {
+        },
+        content = { paddingValues ->
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
+                // List each notification item
                 items(notifications) { notification ->
-                    NotificationItem(notification)
-                    Divider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 0.5.dp)
+                    NotificationCard(notification)
                 }
             }
         }
-    }
+    )
 }
 
 @Composable
-fun NotificationItem(notification: Notification) {
-    val backgroundColor = if (notification.isRead) {
-        MaterialTheme.colorScheme.surfaceVariant
-    } else {
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-    }
-
-    Row(
+fun NotificationCard(notification: NotificationItem) {
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .background(backgroundColor)
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-            .clickable { /* TODO: Handle notification click */ },
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
-        Icon(
-            imageVector = notification.icon,
-            contentDescription = "Notification Icon",
-            tint = if (notification.isRead) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(40.dp)
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = notification.title,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = if (notification.isRead) FontWeight.Normal else FontWeight.Bold
-                ),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSurface
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = Color.Black
             )
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = notification.message,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                fontSize = 14.sp,
+                color = Color.DarkGray
             )
-        }
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = getTimeAgo(notification.time),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-fun getTimeAgo(time: Long): String {
-    val now = System.currentTimeMillis()
-    val diff = now - time
-
-    val seconds = diff / 1000
-    val minutes = seconds / 60
-    val hours = minutes / 60
-    val days = hours / 24
-
-    return when {
-        seconds < 60 -> "Just now"
-        minutes < 60 -> "$minutes min ago"
-        hours < 24 -> "$hours hr ago"
-        days < 7 -> "$days d ago"
-        else -> {
-            val sdf = SimpleDateFormat("MMM dd", Locale.getDefault())
-            sdf.format(Date(time))
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = notification.time,
+                fontSize = 12.sp,
+                color = Color.Gray
+            )
         }
     }
 }
@@ -195,7 +107,5 @@ fun getTimeAgo(time: Long): String {
 @Preview(showBackground = true)
 @Composable
 fun NotificationScreenPreview() {
-    MaterialTheme {
-        NotificationScreen()
-    }
+    NotificationScreen(navController = rememberNavController())
 }

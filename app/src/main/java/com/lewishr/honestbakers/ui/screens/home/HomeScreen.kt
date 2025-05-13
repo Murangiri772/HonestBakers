@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,22 +18,30 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MailOutline
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -57,72 +68,114 @@ import com.lewishr.honestbakers.navigation.ROUT_CHAT
 import com.lewishr.honestbakers.navigation.ROUT_HOME
 import com.lewishr.honestbakers.navigation.ROUT_LOCATION
 import com.lewishr.honestbakers.navigation.ROUT_MENU
-import com.lewishr.honestbakers.navigation.ROUT_PROFILE
-import com.lewishr.honestbakers.ui.theme.newbrown
+import com.lewishr.honestbakers.navigation.ROUT_MENU_BAKES
 
+import com.lewishr.honestbakers.navigation.ROUT_NOTIFICATION
+import com.lewishr.honestbakers.navigation.ROUT_PROFILE
+import com.lewishr.honestbakers.navigation.ROUT_RECIPE
+import com.lewishr.honestbakers.ui.theme.newwite
+
+
+val deepbrown = Color(0xFF4E342E)    // Deep brown color used
+val newbrown = deepbrown             // For usage consistency, using deepbrown as newbrown
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
     var selectedIndex by remember { mutableStateOf(0) }
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Welcome to HonestBakers",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp
+                        ,color = newwite
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigate(ROUT_HOME) }) {
+                        Icon(Icons.Default.Menu, contentDescription = "Back", tint = Color.White)
+                    }
+                },
+                actions = {
+
+                    IconButton(onClick = { navController.navigate(ROUT_NOTIFICATION) }) {
+                        Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notification", tint = Color.White)
+                    }
+                    IconButton(onClick = { navController.navigate(ROUT_RECIPE) }) {
+                        Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "Forward", tint = Color.White)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = deepbrown,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White,
+                    actionIconContentColor = Color.White
+                )
+            )
+        },
         bottomBar = {
-            NavigationBar(containerColor = newbrown) {
+            NavigationBar(containerColor = deepbrown) {
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-                    label = { Text("Home") },
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White) },
+                    label = { Text("Home",color = newwite) },
                     selected = selectedIndex == 0,
                     onClick = {
                         selectedIndex = 0
                         navController.navigate(ROUT_HOME)
                     },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFF4E342E), // Dark Brown
-                        selectedTextColor = Color(0xFF4E342E),
-                        indicatorColor = Color(0xFFFFF3E0) // Light cream highlight
+                        selectedIconColor = deepbrown,
+                        selectedTextColor = deepbrown,
+                        indicatorColor = Color(0xFFFFF3E0)
                     )
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.LocationOn, contentDescription = "Location") },
-                    label = { Text("Location") },
+                    icon = { Icon(Icons.Default.LocationOn, contentDescription = "Location", tint = Color.White) },
+                    label = { Text("Location",color = newwite) },
                     selected = selectedIndex == 1,
                     onClick = {
                         selectedIndex = 1
                         navController.navigate(ROUT_LOCATION)
                     },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFF4E342E),
-                        selectedTextColor = Color(0xFF4E342E),
+                        selectedIconColor = deepbrown,
+                        selectedTextColor = deepbrown,
                         indicatorColor = Color(0xFFFFF3E0)
                     )
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.MailOutline, contentDescription = "Messages") },
-                    label = { Text("Messages") },
+                    icon = { Icon(Icons.Default.MailOutline, contentDescription = "Messages", tint = Color.White) },
+                    label = { Text("Messages",color = newwite) },
                     selected = selectedIndex == 2,
                     onClick = {
                         selectedIndex = 2
                         navController.navigate(ROUT_CHAT)
                     },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFF4E342E),
-                        selectedTextColor = Color(0xFF4E342E),
+                        selectedIconColor = deepbrown,
+                        selectedTextColor = deepbrown,
                         indicatorColor = Color(0xFFFFF3E0)
                     )
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
-                    label = { Text("Profile") },
+                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White) },
+                    label = { Text("Profile",color = newwite) },
                     selected = selectedIndex == 3,
                     onClick = {
                         selectedIndex = 3
                         navController.navigate(ROUT_PROFILE)
                     },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFF4E342E),
-                        selectedTextColor = Color(0xFF4E342E),
+                        selectedIconColor = deepbrown,
+                        selectedTextColor = deepbrown,
                         indicatorColor = Color(0xFFFFF3E0)
                     )
                 )
+
             }
         },
         content = { paddingValues ->
@@ -131,35 +184,57 @@ fun HomeScreen(navController: NavController) {
                     .padding(paddingValues)
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .background(color = Color(0xFFFFF8E1)) // Warm light cream background
+                    .background(color = Color(0xFFFFF8E1))
             ) {
-                // Top banner card
+                // Top banner card with gradient overlay
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     shape = RoundedCornerShape(16.dp),
-
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.img_8),
-                        contentDescription = "Bakery Top Banner",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(220.dp),
-                        contentScale = ContentScale.Crop
-                    )
+                    Box {
+                        Image(
+                            painter = painterResource(R.drawable.img_1),
+                            contentDescription = "Bakery Top Banner",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(220.dp),
+                            contentScale = ContentScale.Crop
+                        )
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(
+                                            Color.Transparent,
+                                            Color.Black.copy(alpha = 0.5f)
+                                        )
+                                    )
+                                )
+                        )
+                        Text(
+                            text = "Freshly Baked Every Day!",
+                            color = Color.White,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(16.dp)
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Introductory bakery text paragraph
                 Text(
                     text = "At HonestBakers, we craft every loaf with passion and the finest ingredients. " +
                             "From classic sourdough to delicate pastries, our baked goods bring warmth and sweetness " +
                             "to every moment. Explore our delicious menu and find your new favorite treat today!",
                     fontSize = 16.sp,
-                    color = Color(0xFF5D4037), // Deep brown text
+                    color = Color(0xFF5D4037),
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier
                         .padding(horizontal = 24.dp)
@@ -169,13 +244,12 @@ fun HomeScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(18.dp))
 
-                // Highlight image card
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     shape = RoundedCornerShape(16.dp),
-
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
                     Image(
                         painter = painterResource(R.drawable.img_3),
@@ -193,7 +267,7 @@ fun HomeScreen(navController: NavController) {
                     text = "Recommended for you",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF4E342E), // Dark Brown
+                    color = deepbrown,
                     modifier = Modifier.padding(start = 24.dp, bottom = 12.dp)
                 )
 
@@ -215,11 +289,11 @@ fun HomeScreen(navController: NavController) {
                                 .width(160.dp)
                                 .height(200.dp)
                                 .clip(RoundedCornerShape(16.dp))
-                                .background(newbrown)
+                                .background(deepbrown)
                                 .shadow(6.dp, RoundedCornerShape(16.dp))
                                 .padding(4.dp),
                             shape = RoundedCornerShape(16.dp),
-                          
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                         ) {
                             Image(
                                 painter = painterResource(imageResId),
@@ -235,14 +309,14 @@ fun HomeScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(28.dp))
 
                 Button(
-                    onClick = { navController.navigate(ROUT_MENU) },
+                    onClick = { navController.navigate(ROUT_MENU_BAKES) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 32.dp)
                         .height(52.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF6D4C41), // Medium brown
-                        contentColor = Color(0xFFFFF3E0) // Light cream text
+                        containerColor = deepbrown,
+                        contentColor = Color(0xFFFFF3E0)
                     ),
                     shape = RoundedCornerShape(28.dp),
                     elevation = ButtonDefaults.buttonElevation(
@@ -251,7 +325,7 @@ fun HomeScreen(navController: NavController) {
                     )
                 ) {
                     Text(
-                        text = "Welcome to our HonestBakers Menu",
+                        text = "Explore Our Delicious Menu",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold
                     )
