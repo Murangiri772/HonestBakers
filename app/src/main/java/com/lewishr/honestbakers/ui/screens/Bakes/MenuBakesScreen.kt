@@ -1,9 +1,10 @@
-package com.lewishr.honestbakers.ui.screens.Bakes
 
+
+
+package com.lewishr.honestbakers.ui.screens.Bakes
 
 import android.net.Uri
 import android.os.Build
-
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,55 +19,35 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-
 import com.lewishr.honestbakers.viewmodel.BakesViewModel
 import com.lewishr.honestbakers.model.Bakes
-
-import com.lewishr.honestbakers.navigation.ROUT_CHAT
-import com.lewishr.honestbakers.navigation.ROUT_EDIT_BAKES
-import com.lewishr.honestbakers.navigation.ROUT_HOME
-import com.lewishr.honestbakers.navigation.ROUT_LOCATION
-import com.lewishr.honestbakers.navigation.ROUT_NOTIFICATION
-import com.lewishr.honestbakers.navigation.ROUT_PAYMENT
-import com.lewishr.honestbakers.navigation.ROUT_PROFILE
-import com.lewishr.honestbakers.navigation.ROUT_RECIPE
-
+import com.lewishr.honestbakers.navigation.*
 import com.lewishr.honestbakers.ui.screens.Menu.deepBrown
 import com.lewishr.honestbakers.ui.screens.Menu.whiteColor
-
-
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuBakesScreen(navController: NavController, viewModel: BakesViewModel) {
     val menuBakes by viewModel.allBakes.observeAsState(emptyList())
-
     var searchQuery by remember { mutableStateOf("") }
-
-
     val filteredBakes = menuBakes.filter {
         it.name.contains(searchQuery, ignoreCase = true)
     }
-
-
-
-
     Scaffold(
         topBar = {
             Column {
                 TopAppBar(
-                    title = { Text("Bakes", fontSize = 20.sp) },
+                    title = { Text("Menu Bakes", fontSize = 20.sp) },
                     colors = TopAppBarDefaults.mediumTopAppBarColors(
                         containerColor = deepBrown,
                         titleContentColor = Color.White,
@@ -78,22 +59,15 @@ fun MenuBakesScreen(navController: NavController, viewModel: BakesViewModel) {
                             Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
                         }
                     },
-
                     actions = {
-
                         IconButton(onClick = { navController.navigate(ROUT_NOTIFICATION) }) {
                             Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notification", tint = Color.White)
                         }
                         IconButton(onClick = { navController.navigate(ROUT_RECIPE) }) {
                             Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "Forward", tint = Color.White)
                         }
-
                     },
-
-                    )
-
-
-                //Search Bar
+                )
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
@@ -110,8 +84,8 @@ fun MenuBakesScreen(navController: NavController, viewModel: BakesViewModel) {
                         )
                     },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Black,  // Border color when focused
-                        unfocusedBorderColor = Color.Gray, // Border color when not focused
+                        focusedBorderColor = Color.Black,
+                        unfocusedBorderColor = Color.Gray,
                         focusedTextColor = Color.Black,
                         unfocusedTextColor = Color.DarkGray
                     )
@@ -155,7 +129,6 @@ fun MenuBakesScreen(navController: NavController, viewModel: BakesViewModel) {
                     onClick = {
                         selectedIndex = 3
                         navController.navigate(ROUT_PROFILE)
-
                     }
                 )
             }
@@ -167,10 +140,9 @@ fun MenuBakesScreen(navController: NavController, viewModel: BakesViewModel) {
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-
             LazyColumn {
                 items(filteredBakes.size) { index ->
-                    BakesItem1(navController, filteredBakes[index], viewModel)
+                    MenuBakesItem(navController, filteredBakes[index])
                 }
             }
         }
@@ -179,12 +151,10 @@ fun MenuBakesScreen(navController: NavController, viewModel: BakesViewModel) {
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
-fun BakesItem1(navController: NavController, bakes: Bakes, viewModel: BakesViewModel) {
+fun MenuBakesItem(navController: NavController, bakes: Bakes) {
     val painter: Painter = rememberAsyncImagePainter(
         model = bakes.imagePath?.let { Uri.parse(it) } ?: Uri.EMPTY
     )
-
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -194,87 +164,61 @@ fun BakesItem1(navController: NavController, bakes: Bakes, viewModel: BakesViewM
                     navController.navigate(ROUT_EDIT_BAKES)
                 }
             },
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
-            // Bakes Image
             Image(
                 painter = painter,
                 contentDescription = "Bakes Image",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
+                    .height(220.dp),
                 contentScale = ContentScale.Crop
             )
-
-            // Gradient Overlay
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp)
+                    .height(100.dp)
                     .align(Alignment.BottomStart)
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
+                            colors = listOf(Color.Transparent, Color(0xFF4A2E0F))
                         )
                     )
             )
-
-            // Product Info
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
-                    .padding(start = 12.dp, bottom = 60.dp)
+                    .padding(start = 16.dp, bottom = 64.dp)
             ) {
                 Text(
                     text = bakes.name,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFFFFE5B4)
                 )
                 Text(
                     text = "Price: Ksh${bakes.price}",
-                    fontSize = 16.sp,
-                    color = Color.White
+                    fontSize = 18.sp,
+                    color = Color(0xFFFFE5B4)
                 )
             }
-
-            // Buttons (Message, Edit, Delete, Download PDF)
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+                    .padding(12.dp)
                     .align(Alignment.BottomEnd)
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                Button(
+                    onClick = {
+                        navController.navigate(ROUT_PAYMENT)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7C4A00)),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth(0.5f)
                 ) {
-                    Spacer(modifier = Modifier.width(20.dp))
-
-                    Button(
-                        onClick = {
-
-
-
-
-                            navController.navigate(ROUT_PAYMENT)
-                        },
-                        colors = ButtonDefaults.buttonColors(Color.DarkGray),
-                        shape = RoundedCornerShape(size = 10.dp),
-                        modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp)
-                    )
-                    {
-                        Text(text = "Order Now", color = Color.Green)
-                    }
-
-
-
-
-
-
-
+                    Text(text = "Order Now", color = Color.Yellow)
                 }
             }
         }
