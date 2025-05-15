@@ -19,7 +19,8 @@ import com.lewishr.honestbakers.repository.UserRepository
 import com.lewishr.honestbakers.ui.screens.Bakes.AddBakesScreen
 import com.lewishr.honestbakers.ui.screens.Bakes.BakesListScreen
 import com.lewishr.honestbakers.ui.screens.Bakes.EditBakesScreen
-import com.lewishr.honestbakers.ui.screens.Bakes.MenuBakesScreen
+import com.lewishr.honestbakers.ui.screens.Bakes.UserBakesScreen
+
 import com.lewishr.honestbakers.ui.screens.Menu.MenuScreen
 import com.lewishr.honestbakers.ui.screens.about.AboutScreen
 import com.lewishr.honestbakers.ui.screens.auth.LoginScreen
@@ -128,9 +129,10 @@ fun AppNavHost(
         composable(ROUT_BAKES_LIST) {
             BakesListScreen(navController, bakesViewModel)
         }
-        composable(ROUT_MENU_BAKES) {
-            MenuBakesScreen(navController, bakesViewModel)
+        composable(ROUT_USER_BAKES) {
+            UserBakesScreen(navController, bakesViewModel)
         }
+
 
         composable(
             route = ROUT_EDIT_BAKES,

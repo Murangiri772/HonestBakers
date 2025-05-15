@@ -28,7 +28,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.lewishr.honestbakers.R
 import com.lewishr.honestbakers.navigation.ROUT_ADD_BAKES
 import com.lewishr.honestbakers.navigation.ROUT_BAKES_LIST
-import com.lewishr.honestbakers.navigation.ROUT_MENU_BAKES
+import com.lewishr.honestbakers.navigation.ROUT_USER_BAKES
+
 import com.lewishr.honestbakers.viewmodel.BakesViewModel
 
 
@@ -164,21 +165,7 @@ fun AddBakesScreen(navController: NavController, viewModel: BakesViewModel) {
                 ) {
                     Text("Add Product", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
-                // Add Product Button
-                Button(
-                    onClick = {
-                        val priceValue = price.toDoubleOrNull()
-                        if (priceValue != null) {
-                            imageUri?.toString()?.let { viewModel.addBakes(name, priceValue,it) }
-                            navController.navigate(ROUT_MENU_BAKES)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(Color.LightGray)
-                ) {
-                    Text("Add Product", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                }
+
             }
         }
     )

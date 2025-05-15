@@ -13,11 +13,12 @@ const val ROUT_LOCATION = "location"
 const val ROUT_SPLASH = "splash"
 const val ROUT_PROFILE = "profile"
 const val ROUT_NOTIFICATION = "notification"
-const val ROUT_MENU_BAKES = "menu_bakes"
+
 //Products
 
 const val ROUT_ADD_BAKES = "add_bakes"
 const val ROUT_BAKES_LIST = "bakes_list"
+const val ROUT_USER_BAKES = "user_bakes"
 
 const val ROUT_EDIT_BAKES = "edit_bakes/{bakesId}"
 

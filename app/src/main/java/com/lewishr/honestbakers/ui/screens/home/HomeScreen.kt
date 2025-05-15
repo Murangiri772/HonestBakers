@@ -68,11 +68,11 @@ import com.lewishr.honestbakers.navigation.ROUT_CHAT
 import com.lewishr.honestbakers.navigation.ROUT_HOME
 import com.lewishr.honestbakers.navigation.ROUT_LOCATION
 import com.lewishr.honestbakers.navigation.ROUT_MENU
-import com.lewishr.honestbakers.navigation.ROUT_MENU_BAKES
 
 import com.lewishr.honestbakers.navigation.ROUT_NOTIFICATION
 import com.lewishr.honestbakers.navigation.ROUT_PROFILE
 import com.lewishr.honestbakers.navigation.ROUT_RECIPE
+import com.lewishr.honestbakers.navigation.ROUT_USER_BAKES
 import com.lewishr.honestbakers.ui.theme.newwite
 
 
@@ -309,7 +309,7 @@ fun HomeScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(28.dp))
 
                 Button(
-                    onClick = { navController.navigate(ROUT_MENU_BAKES) },
+                    onClick = { navController.navigate(ROUT_USER_BAKES) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 32.dp)
